@@ -1,5 +1,7 @@
+require('dotenv').config();
 const razorpay = require("../services/razorpayClient");
 const { initializeConnection } = require("../config/database");
+
 
 const checkPurchasedCourses = async (userId, courseIds) => {
   try {

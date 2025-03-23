@@ -18,7 +18,7 @@ const MyCourses = () => {
   async function refreshToken() {
     try {
       const response = await axios.post(
-        "https://localhost:3000/auth/refresh-token",
+        "http://localhost:3000/auth/refresh-token",
         {},
         {
           headers: {
@@ -40,7 +40,7 @@ const MyCourses = () => {
     let token = localStorage.getItem("token");
     try {
       const response = await axios.get(
-        "https://localhost:3000/purchased/purchased-courses",
+        "http://localhost:3000/purchased/purchased-courses",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -56,7 +56,7 @@ const MyCourses = () => {
         try {
           token = await refreshToken();
           const response = await axios.get(
-            "https://localhost:3000/purchased/purchased-courses",
+            "http://localhost:3000/purchased/purchased-courses",
             {
               headers: {
                 Authorization: `Bearer ${token}`,

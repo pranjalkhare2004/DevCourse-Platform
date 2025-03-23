@@ -49,85 +49,61 @@ const Courses = () => {
   }, [selectedItems]);
 
   const handlePayment = async () => {
-    let token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
     const refreshToken = localStorage.getItem("refreshToken");
-
-    if (!token) {
-      return;
-    }
-
+  
+    if (!token) return;
+  
     try {
-      const response = await fetch(
-        "https://localhost:3000/checkout/create-checkout-session",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ items: selectedItems }),
-        }
-      );
-
+      const response = await fetch("http://localhost:3000/checkout/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ items: selectedItems }),
+      });
+  
       if (response.ok) {
-        const { url } = await response.json();
-        window.location = url;
-      } else if (response.status === 401) {
-        // Token might be expired, try refreshing it
-        const refreshResponse = await fetch(
-          "https://localhost:3000/auth/refresh",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ refreshToken }),
-          }
-        );
-
-        if (refreshResponse.ok) {
-          const { token: newToken } = await refreshResponse.json();
-          localStorage.setItem("token", newToken);
-
-          // Retry payment with new token
-          const retryResponse = await fetch(
-            "https://localhost:3000/checkout/create-checkout-session",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${newToken}`,
-              },
-              body: JSON.stringify({ items: selectedItems }),
-            }
-          );
-
-          if (retryResponse.ok) {
-            const { url } = await retryResponse.json();
-            window.location = url;
-          } else {
-            console.error("Retrying payment failed");
-          }
-        } else {
-          console.error("Refreshing token failed");
-        }
+        const data = await response.json();
+        const options = {
+          key: data.clientKey,
+          amount: data.amount,
+          currency: data.currency,
+          name: "My Course Platform",
+          description: "Course Purchase",
+          order_id: data.orderId,
+          handler: function (response) {
+            // This will be triggered when payment is successful
+            alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
+          },
+          prefill: {
+            name: "Student Name",
+            email: "student@example.com",
+          },
+          notes: {
+            courses: data.courseNames.join(", "),
+          },
+          theme: {
+            color: "#00FF99",
+          },
+        };
+  
+        const razorpay = new window.Razorpay(options);
+        razorpay.open();
       } else {
         const errorData = await response.json();
         if (errorData.purchasedCourseIds) {
-          alert(
-            `You have already purchased courses with IDs: ${errorData.purchasedCourseIds.join(
-              ", "
-            )}`
-          );
+          alert(`You have already purchased courses with IDs: ${errorData.purchasedCourseIds.join(", ")}`);
         } else {
           alert(`Error: ${errorData.message}`);
         }
       }
     } catch (error) {
-      console.error("Error during payment:", error);
+      console.error("Error during Razorpay payment:", error);
     }
   };
-
+  
   const handleChange = (event) => {
     const { value, checked } = event.target;
     const id = parseInt(value);

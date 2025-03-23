@@ -1,9 +1,9 @@
+require('dotenv').config();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { initializeConnection } = require("../config/database");
 
 // Load environment variables
-require('dotenv').config();
 
 const secretKey = process.env.SECRET_KEY;
 const refreshSecretKey = process.env.REFRESH_SECRET_KEY;

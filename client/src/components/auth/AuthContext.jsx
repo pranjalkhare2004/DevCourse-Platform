@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
 
   const checkPurchasedCourses = async (token) => {
     try {
-      const response = await axios.get('https://localhost:3000/purchased/purchased-courses', {
+      const response = await axios.get('http://localhost:3000/purchased/purchased-courses', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

@@ -8,7 +8,7 @@ const CourseContent = ({ match }) => {
     const fetchCourseContent = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`https://localhost:3000/course-content/course-content/${match.params.id}`, {
+        const response = await axios.get(`http://localhost:3000/course-content/course-content/${match.params.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCourse(response.data);
