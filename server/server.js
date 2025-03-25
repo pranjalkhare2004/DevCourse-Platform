@@ -16,10 +16,6 @@ app.use(cors({
 
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
-app.get("*", (_, res) => {
-  res.sendFile(path.resolve(__dirname, "../client/dist/index.html"));
-});
-
 const authRoutes = require("./routes/authRoutes");
 const checkoutRoutes = require("./routes/checkoutRoutes");
 const courseRoutes = require("./routes/courseRoutes");
@@ -36,6 +32,10 @@ app.use("/purchased", purchasedCoursesRoutes);
 app.use("/store-purchase", storePurchaseRoutes);
 app.use("/course-content", courseContentRoutes);
 
+
+app.get("*", (_, res) => {
+  res.sendFile(path.resolve(__dirname, "../client/dist/index.html"));
+});
 
 initializeConnection()
   .then((connection) => {
