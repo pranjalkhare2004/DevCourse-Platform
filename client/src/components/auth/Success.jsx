@@ -1,35 +1,8 @@
-import React, { useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Success = () => {
   const navigate = useNavigate();
-  const location = useLocation();
- 
-  useEffect(() => {
-    const query = new URLSearchParams(location.search);
-    const sessionId = query.get('session_id');
-    const courseIds = JSON.parse(query.get('course_id') || '[]');
-
-    if (sessionId && courseIds.length > 0) {
-      const storePurchase = async () => {
-        try {
-         const response = await axios.post('http://localhost:3000/store-purchase/store-purchase', 
-          {
-            courseIds: courseIds
-          }, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-          });
-        } catch (error) {
-          console.error('Error storing purchase:', error);
-        }
-      };
-
-      storePurchase();
-    }
-  }, [location]);
 
   const handleGoToCourses = () => {
     navigate('/my-courses');

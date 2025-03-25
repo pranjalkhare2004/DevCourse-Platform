@@ -73,21 +73,50 @@ const Courses = () => {
           name: "My Course Platform",
           description: "Course Purchase",
           order_id: data.orderId,
-          handler: function (response) {
-            // This will be triggered when payment is successful
-            alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
-          },
-          prefill: {
-            name: "Student Name",
-            email: "student@example.com",
-          },
-          notes: {
-            courses: data.courseNames.join(", "),
-          },
-          theme: {
-            color: "#00FF99",
-          },
-        };
+
+          
+          handler: async function (response) {
+            alert("Payment successful!");
+          
+            try {
+              const verifyRes = await fetch("http://localhost:3000/checkout/verify-payment", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  paymentId: response.razorpay_payment_id,
+                  orderId: response.razorpay_order_id,
+                  courseIds: selectedItems.map(item => item.id),
+                }),
+              });
+          
+              const data = await verifyRes.json();
+              if (data.success) {
+                // ✅ NEW: Trigger storePurchase API
+                await fetch("http://localhost:3000/store-purchase/store-purchase", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                  body: JSON.stringify({
+                    courseIds: selectedItems.map(item => item.id),
+                  }),
+                });
+          
+                alert("Courses added to your account!");
+                window.location.href = "/my-courses";
+              } else {
+                alert("Payment verified but course addition failed.");
+              }
+            } catch (error) {
+              console.error("Error verifying payment:", error);
+              alert("Payment done, but failed to save courses. Contact support.");
+            }
+          }
+        };                    
   
         const razorpay = new window.Razorpay(options);
         razorpay.open();
